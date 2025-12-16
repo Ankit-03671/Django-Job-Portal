@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Login - Job Portal{% endblock %}
+
+{% block content %}
+<h2>🔐 Login</h2>
+
+<form id="loginForm" method="post">
+    {% csrf_token %}
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+</form>
+
+<p style="text-align: center; margin-top: 1rem;">
+    Don't have an account? <a href="{% url 'register' %}">Register here</a>
+</p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    showLoading();
+});
+</script>
+{% endblock %}

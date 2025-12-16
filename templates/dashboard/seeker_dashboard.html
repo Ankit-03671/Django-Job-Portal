@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}My Applications - Job Portal{% endblock %}
+
+{% block content %}
+<h1>📊 My Job Applications</h1>
+
+{% if applications %}
+    <div class="applications-grid">
+        {% for application in applications %}
+        <div class="job-card">
+            <h3>{{ application.job.title }}</h3>
+            <p><strong>Company:</strong> {{ application.job.company_name }}</p>
+            <p><strong>Location:</strong> {{ application.job.location }}</p>
+            <p><strong>Applied:</strong> {{ application.applied_at|date:"M d, Y" }}</p>
+            <p><strong>Status:</strong> <span class="status-pending">Pending</span></p>
+            {% if application.resume %}
+                <p><strong>Resume:</strong> <a href="{{ application.resume.url }}" target="_blank">📄 View Resume</a></p>
+            {% endif %}
+            {% if application.cover_letter %}
+                <p><strong>Cover Letter:</strong> <a href="{{ application.cover_letter.url }}" target="_blank">View Cover Letter</a></p>
+            {% endif %}
+            <a href="{% url 'job_list' %}" class="btn">View Similar Jobs</a>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div style="text-align: center; padding: 3rem;">
+        <h3>No applications yet</h3>
+        <p>Start applying to jobs to see them here!</p>
+        <a href="{% url 'job_list' %}" class="btn">Browse Jobs</a>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Add status styling
+document.addEventListener('DOMContentLoaded', function() {
+    const statusElements = document.querySelectorAll('.status-pending');
+    statusElements.forEach(el => {
+        el.style.cssText = `
+            background: #fff3cd;
+            color: #856404;
+            padding: 0.25rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.875rem;
+        `;
+    });
+});
+</script>
+{% endblock %}

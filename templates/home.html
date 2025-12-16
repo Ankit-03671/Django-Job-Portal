@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% block title %}Job Portal - Find Your Dream Job{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title"> Find Your Dream Job Today</h1>
+        <p class="hero-subtitle">Connect with top employers and discover amazing career opportunities</p>
+        
+        <!-- Quick Search -->
+        <div class="hero-search">
+            <form action="{% url 'job_list' %}" method="get" class="search-hero">
+                <input type="text" name="q" placeholder=" Search jobs, companies..." class="search-input">
+                <input type="text" name="location" placeholder=" Location" class="location-input">
+                <button type="submit" class="search-btn">Search Jobs</button>
+            </form>
+        </div>
+        
+        <!-- CTA Buttons -->
+        <div class="hero-buttons">
+            {% if not user.is_authenticated %}
+                <a href="{% url 'register' %}" class="btn-primary">Get Started Free</a>
+                <a href="{% url 'job_list' %}" class="btn-secondary">Browse Jobs</a>
+            {% else %}
+                <a href="{% url 'job_list' %}" class="btn-primary">Browse Jobs</a>
+                <a href="{% url 'seeker_dashboard' %}" class="btn-secondary">My Dashboard</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+<div class="stats-section">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">💼</div>
+            <div class="stat-number">{{ total_jobs }}</div>
+            <div class="stat-label">Active Jobs</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number">{{ total_users }}</div>
+            <div class="stat-label">Registered Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📄</div>
+            <div class="stat-number">{{ total_applications }}</div>
+            <div class="stat-label">Applications Sent</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🏢</div>
+            <div class="stat-number">{{ top_companies|length }}</div>
+            <div class="stat-label">Top Companies</div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="features-section">
+    <h2> Why Choose Our Platform?</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon"></div>
+            <h3>Fast & Easy</h3>
+            <p>Apply to jobs with one click. Upload your resume once and apply everywhere.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"></div>
+            <h3>Smart Matching</h3>
+            <p>Get personalized job recommendations based on your skills and preferences.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"></div>
+            <h3>Secure & Private</h3>
+            <p>Your data is protected. Control who sees your profile and applications.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"></div>
+            <h3>Mobile Ready</h3>
+            <p>Access jobs anywhere, anytime. Our platform works on all devices.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Jobs Section -->
+{% if recent_jobs %}
+<div class="recent-jobs-section">
+    <h2> Latest Job Opportunities</h2>
+    <div class="jobs-grid">
+        {% for job in recent_jobs %}
+        <div class="job-card-mini">
+            <div class="job-header">
+                <h4>{{ job.title }}</h4>
+                <span class="job-salary">{{ job.salary }}</span>
+            </div>
+            <p class="job-company"> {{ job.company_name }}</p>
+            <p class="job-location"> {{ job.location }}</p>
+            <p class="job-description">{{ job.description|truncatewords:15 }}</p>
+            <div class="job-footer">
+                <span class="job-date">{{ job.created_at|timesince }} ago</span>
+                <a href="{% url 'apply_job' job.id %}" class="apply-btn">Apply Now</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="view-all">
+        <a href="{% url 'job_list' %}" class="btn-outline">View All Jobs →</a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Top Companies Section -->
+{% if top_companies %}
+<div class="companies-section">
+    <h2> Top Hiring Companies</h2>
+    <div class="companies-grid">
+        {% for company in top_companies %}
+        <div class="company-card">
+            <div class="company-logo">{{ company.company_name|first|upper }}</div>
+            <div class="company-info">
+                <h4>{{ company.company_name }}</h4>
+                <p>{{ company.job_count }} open position{{ company.job_count|pluralize }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Call to Action Section -->
+<div class="cta-section">
+    <div class="cta-content">
+        <h2>Ready to Start Your Career Journey?</h2>
+        <p>Join thousands of professionals who found their dream jobs through our platform</p>
+        {% if not user.is_authenticated %}
+            <a href="{% url 'register' %}" class="btn-cta">Create Free Account</a>
+        {% else %}
+            <a href="{% url 'job_list' %}" class="btn-cta">Explore Opportunities</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Counter animation for statistics
+function animateCounters() {
+    const counters = document.querySelectorAll('.stat-number');
+    counters.forEach(counter => {
+        const target = parseInt(counter.textContent);
+        const increment = target / 50;
+        let current = 0;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                counter.textContent = target;
+                clearInterval(timer);
+            } else {
+                counter.textContent = Math.floor(current);
+            }
+        }, 30);
+    });
+}
+
+// Intersection Observer for animations
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('animate-in');
+            if (entry.target.classList.contains('stats-section')) {
+                animateCounters();
+            }
+        }
+    });
+}, observerOptions);
+
+// Observe sections for animation
+document.addEventListener('DOMContentLoaded', () => {
+    const sections = document.querySelectorAll('.stats-section, .features-section, .recent-jobs-section');
+    sections.forEach(section => observer.observe(section));
+});
+</script>
+{% endblock %}

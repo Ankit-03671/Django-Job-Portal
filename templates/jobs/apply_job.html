@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Apply for {{ job.title }} - Job Portal{% endblock %}
+
+{% block content %}
+<h2>Apply for {{ job.title }}</h2>
+
+<div class="job-info" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+    <h3>{{ job.title }}</h3>
+    <p><strong>Company:</strong> {{ job.company_name }}</p>
+    <p><strong>Location:</strong> {{ job.location }}</p>
+    <p><strong>Salary:</strong> {{ job.salary }}</p>
+    <p><strong>Description:</strong> {{ job.description }}</p>
+</div>
+
+<form id="applicationForm" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <div style="margin-bottom: 1.5rem;">
+        <label for="resume" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">
+            Upload Resume (PDF, DOC, DOCX)
+        </label>
+        <input type="file" name="resume" id="resume" accept=".pdf,.doc,.docx" required
+               style="padding: 0.8rem; border: 2px dashed #007bff; border-radius: 8px; width: 100%;">
+        <small style="color: #666;">Max file size: 5MB</small>
+    </div>
+    
+    <div style="margin-bottom: 1.5rem;">
+        <label for="cover_letter" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">
+            Upload Cover Letter (Optional)
+        </label>
+        <input type="file" name="cover_letter" id="cover_letter" accept=".pdf,.doc,.docx"
+               style="padding: 0.8rem; border: 2px dashed #28a745; border-radius: 8px; width: 100%;">
+        <small style="color: #666;">Upload PDF, DOC, or DOCX file (Max 5MB)</small>
+    </div>
+    
+    <button type="submit"> Submit Application</button>
+</form>
+
+<div style="text-align: center; margin-top: 1rem;">
+    <a href="{% url 'job_list' %}" style="color: #666;">← Back to Jobs</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('applicationForm').addEventListener('submit', function(e) {
+    const fileInput = document.getElementById('resume');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        e.preventDefault();
+        alert('Please upload your resume');
+        return;
+    }
+    
+    // Check file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+        e.preventDefault();
+        alert('File size must be less than 5MB');
+        return;
+    }
+    
+    // Check file type
+    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedTypes.includes(file.type)) {
+        e.preventDefault();
+        alert('Please upload a PDF, DOC, or DOCX file');
+        return;
+    }
+    
+    showLoading();
+});
+
+// File upload preview
+document.getElementById('resume').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const fileName = file.name;
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        
+        // Create preview element
+        let preview = document.getElementById('file-preview');
+        if (!preview) {
+            preview = document.createElement('div');
+            preview.id = 'file-preview';
+            preview.style.cssText = `
+                margin-top: 0.5rem;
+                padding: 0.5rem;
+                background: #e8f5e8;
+                border-radius: 4px;
+                font-size: 0.9rem;
+            `;
+            this.parentNode.appendChild(preview);
+        }
+        
+        preview.innerHTML = `✅ ${fileName} (${fileSize} MB)`;
+    }
+});
+</script>
+{% endblock %}

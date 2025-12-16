@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Jobs - Job Portal{% endblock %}
+
+{% block content %}
+<h1>🔍 Available Jobs</h1>
+
+<form id="searchForm" class="search-form" method="get">
+    <input type="text" name="q" id="searchQuery" placeholder="Search jobs..." value="{{ request.GET.q }}">
+    <input type="text" name="location" id="searchLocation" placeholder="Location..." value="{{ request.GET.location }}">
+    <button type="submit">Search</button>
+</form>
+
+{% if jobs %}
+    <div id="jobsList">
+        {% for job in jobs %}
+        <div class="job-card">
+            <h3>{{ job.title }}</h3>
+            <p><strong>Company:</strong> {{ job.company_name }}</p>
+            <p><strong>Location:</strong> {{ job.location }}</p>
+            <p><strong>Salary:</strong> {{ job.salary }}</p>
+            <p><strong>Description:</strong> {{ job.description|truncatewords:20 }}</p>
+            <p><small>Posted: {{ job.created_at|date:"M d, Y" }}</small></p>
+            
+            {% if user.is_authenticated %}
+                <a href="{% url 'apply_job' job.id %}" class="btn">📄 Apply Now</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn">Login to Apply</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div style="text-align: center; padding: 2rem;">
+        <h3>No jobs found</h3>
+        <p>Try adjusting your search criteria or check back later.</p>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Real-time search
+    const searchInputs = document.querySelectorAll('#searchQuery, #searchLocation');
+    searchInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            // Add debounce for better performance
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                // Auto-submit form after 500ms of no typing
+                if (this.value.length > 2 || this.value.length === 0) {
+                    document.getElementById('searchForm').submit();
+                }
+            }, 500);
+        });
+    });
+});
+</script>
+{% endblock %}

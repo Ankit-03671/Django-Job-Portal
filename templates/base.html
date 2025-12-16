@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Job Portal{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+<body>
+    <nav>
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'job_list' %}">Jobs</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'seeker_dashboard' %}">Dashboard</a>
+            <a href="{% url 'profile' %}">Profile</a>
+            <a href="{% url 'logout' %}">Logout ({{ user.username }})</a>
+        {% else %}
+            <a href="{% url 'register' %}">Register</a>
+            <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+    </nav>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
+    <main>
+        {% block content %}
+        <h1>Welcome to Job Portal</h1>
+        <p style="text-align: center; font-size: 1.2rem; margin-bottom: 2rem;">Find your dream job or hire the perfect candidate</p>
+        <div style="text-align: center;">
+            <a href="{% url 'job_list' %}" class="btn">Browse Jobs</a>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'register' %}" class="btn">Get Started</a>
+            {% endif %}
+        </div>
+        {% endblock %}
+    </main>
+    
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/animations.js' %}"></script>
+    <script src="{% static 'js/home.js' %}"></script>
+    <script>
+    // Ensure CSRF token is available
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
