@@ -31,7 +31,13 @@ SECRET_KEY = 'django-insecure-sln6#ew^m9pkk1g0m3wx7=@8#gzil9$38mzyd(439ek)(s-ri$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'django-job-portal-xxuv.onrender.com',
+    '.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
+
 
 
 # Application definition
