@@ -20,7 +20,12 @@ def register(request):
             email=email,
             password=password
         )
+
+        # Remove admin privileges for regular users
+        user.is_staff = False
+        user.is_superuser = False
         user.save()
+
         messages.success(request, 'Registration successful')
         return redirect('login')
 
